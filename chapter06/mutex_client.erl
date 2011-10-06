@@ -1,5 +1,6 @@
 -module(mutex_client).
 -export([all/0]).
+-export([start/1, send/2]).
 -export([loop/1]).
 
 start(Name) ->

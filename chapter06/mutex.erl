@@ -20,6 +20,7 @@ signal() ->
 
 init() -> 
   io:format("~w init~n", [self()]),
+  process_flag(trap_exit, true),
   free().
 
 free() ->
@@ -33,8 +34,15 @@ busy(Pid) ->
   receive
     {show, Sender} ->
       reply(Sender, "mutex belongs to " ++ pid_to_list(Pid)),
+      link(Pid),
       busy(Pid);
-    {signal, Pid} -> free()
+    {'EXIT', Pid, Reason} ->
+      io:format("~p EXIT because ~p~n", [Pid, Reason]),
+      unlink(Pid),
+      free();
+    {signal, Pid} ->
+      unlink(Pid),
+      free()
   end.
 
 terminate() ->
