@@ -34,8 +34,11 @@ busy(Pid) ->
   receive
     {show, Sender} ->
       reply(Sender, "mutex belongs to " ++ pid_to_list(Pid)),
-      link(Pid),
-      busy(Pid);
+      try link(Pid) of
+        true -> busy(Pid)
+      catch
+        _:_ -> free()
+      end;
     {'EXIT', Pid, Reason} ->
       io:format("~p EXIT because ~p~n", [Pid, Reason]),
       unlink(Pid),
