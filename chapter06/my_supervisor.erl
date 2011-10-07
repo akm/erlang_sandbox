@@ -18,10 +18,10 @@ init(ChildSpecList) ->
   loop(start_children(ChildSpecList)).
 
 start_children([]) -> [];
-start_children([{M, F, A} | ChildSpecList]) ->
+start_children([{T,M, F, A} | ChildSpecList]) ->
   case (catch apply(M,F,A)) of
     {ok, Pid} ->
-      [{Pid, {M,F,A}}|start_children(ChildSpecList)];
+      [{Pid, {T,M,F,A}}|start_children(ChildSpecList)];
     _ ->
       start_children(ChildSpecList)
   end.
@@ -31,13 +31,30 @@ start_children([{M, F, A} | ChildSpecList]) ->
 %% child, replacing its entry in the list of children stored in the ChildList variable:
 
 restart_child(Pid, ChildList) ->
-  {value, {Pid, {M,F,A}}} = lists:keysearch(Pid, 1, ChildList),
+  {T,M,F,A} = child_spec(Pid, ChildList),
   {ok, NewPid} = apply(M,F,A),
-  [{NewPid, {M,F,A}}|lists:keydelete(Pid,1,ChildList)].
+  [{NewPid, {T,M,F,A}}|lists:keydelete(Pid,1,ChildList)].
+
+child_spec(Pid, ChildList) ->
+  {value, {Pid, {T,M,F,A}}} = lists:keysearch(Pid, 1, ChildList),
+  {T,M,F,A}.
 
 loop(ChildList) ->
   receive
-    {'EXIT', Pid, _Reason} ->
+    {'EXIT', Pid, normal} ->
+      io:format("~p EXIT normally~n", [Pid]),
+      {T,_M,_F,_A} = child_spec(Pid, ChildList),
+      io:format("~p EXIT normally Type: ~p~n", [Pid, T]),
+      case T of
+        permanent ->
+          NewChildList = restart_child(Pid, ChildList),
+          loop(NewChildList);
+        transient ->
+          NewChildList = lists:keydelete(Pid,1,ChildList),
+          loop(NewChildList)
+      end;
+    {'EXIT', Pid, _Other} ->
+      io:format("~p EXIT because of ~p~n", [Pid, _Other]),
       NewChildList = restart_child(Pid, ChildList),
       loop(NewChildList);
     {stop, From}  ->
