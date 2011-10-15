@@ -1,2 +1,1 @@
--record(circle, {radius}).
 -record(rectangle, {length,width}).
