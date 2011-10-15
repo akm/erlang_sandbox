@@ -8,6 +8,7 @@
 
 -module(records1).
 -export([birthday/1, joe/0, showPerson/1]).
+-export([foobar/1]).
 
 -record(person, {name,age=0,phone,address}).
 
@@ -21,3 +22,7 @@ joe() ->
 
 showPerson(#person{age=Age,phone=Phone,name=Name}) ->
   io:format("name: ~p  age: ~p  phone: ~p~n", [Name,Age,Phone]).
+
+
+foobar(P) when is_record(P, person) and (P#person.name == "Joe") -> ok;
+foobar(_) -> ng.
