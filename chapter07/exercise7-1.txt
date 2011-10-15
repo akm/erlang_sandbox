@@ -1,0 +1,47 @@
+$ erl
+Eshell V5.8.4  (abort with ^G)
+1> c(records1).
+{ok,records1}
+4> Joe = records1:joe().
+{person,"Joe",21,"999-999"}
+6> Joe2 = records1:birthday(Joe).
+{person,"Joe",22,"999-999"}
+7> records1:showPerson(Joe).
+name: "Joe"  age: 21  phone: "999-999"
+ok
+
+%%%%%% ここで#personにaddressを追加した
+
+8> c(records1).                  
+{ok,records1}
+9> records1:showPerson(Joe).
+** exception error: no function clause matching records1:showPerson({person,"Joe",21,"999-999"})
+12> Joe3 = records1:joe().
+{person,"Joe",21,"999-999",undefined}
+13> Joe4 = records1:birthday(Joe3).
+{person,"Joe",22,"999-999",undefined}
+14> records1:showPerson(Joe3).     
+name: "Joe"  age: 21  phone: "999-999"
+ok
+15> records1:showPerson(Joe2).
+** exception error: no function clause matching records1:showPerson({person,"Joe",22,"999-999"})
+16> q().
+ok
+17> q().
+
+%%% 再度実行
+
+$ erl
+Erlang R14B03 (erts-5.8.4) [source] [64-bit] [smp:4:4] [rq:4] [async-threads:0] [hipe] [kernel-poll:false]
+
+Eshell V5.8.4  (abort with ^G)
+1> c(records1).
+{ok,records1}
+2> Joe = records1:joe().
+{person,"Joe",21,"999-999",undefined}
+3> records1:showPerson(Joe).
+name: "Joe"  age: 21  phone: "999-999"
+ok
+
+
+%%% 回答: 修正が必要な既存関数はなし。すべて修正は不要。
