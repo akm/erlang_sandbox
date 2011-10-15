@@ -1,0 +1,1 @@
+-record(triangle3edges, {a,b,c}).
