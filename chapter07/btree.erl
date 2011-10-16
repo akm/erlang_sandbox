@@ -1,7 +1,8 @@
 -module(btree).
 -export([new/3]).
 -export([flatten/1]).
--export([sum/1, max/1]).
+-export([sum/1, max/1, min/1]).
+-export([is_ordered/1]).
 -include("btree.hrl").
 
 new(Left, Data, Right) ->
@@ -16,6 +17,20 @@ flatten_acc(#btree{left=Left     , data=Data, right=Right    }, Acc) -> flatten_
 
 sum(Node) -> lists:sum(flatten(Node)).
 max(Node) -> lists:max(flatten(Node)).
+min(Node) -> lists:min(flatten(Node)).
+
+
+is_ordered(#btree{left=Left, data=Data, right=Right}) -> 
+  is_ordered_left(Left, Data) and is_ordered_right(Right, Data).
+
+is_ordered_left(undefined, _Data) -> true;
+is_ordered_left(Node, Data) ->
+  is_ordered(Node) and (max(Node) =< Data).
+
+is_ordered_right(undefined, _Data) -> true;
+is_ordered_right(Node, Data) ->
+  is_ordered(Node) and (min(Node) >= Data).
+
 
 % NODE1 = btree:new(undefined, 1, undefined).
 % NODE2 = btree:new(undefined, 2, undefined).
