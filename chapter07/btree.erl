@@ -1,32 +1,21 @@
 -module(btree).
 -export([new/3]).
+-export([flatten/1]).
 -export([sum/1, max/1]).
 -include("btree.hrl").
 
 new(Left, Data, Right) ->
   #btree{left=Left, data=Data, right=Right}.
 
-sum(undefined) -> 0;
-sum(#btree{left=Left, data=Data, right=Right}) -> sum(Left) + Data + sum(Right).
+flatten(Node) -> flatten_acc(Node, []).
 
-max(undefined) -> undefined;
-max(#btree{left=Left, data=Data, right=Right}) ->
-  max_acc(max(Left), Data, max(Right)).
+flatten_acc(#btree{left=undefined, data=Data, right=undefined}, Acc) -> [Data|Acc];
+flatten_acc(#btree{left=Left     , data=Data, right=undefined}, Acc) -> flatten_acc(Left, [Data|Acc]);
+flatten_acc(#btree{left=undefined, data=Data, right=Right    }, Acc) -> [Data| flatten_acc(Right, Acc)];
+flatten_acc(#btree{left=Left     , data=Data, right=Right    }, Acc) -> flatten_acc(Left, [Data| flatten_acc(Right, Acc)]).
 
-max_acc(undefined,B,undefined) -> B;
-max_acc(undefined,B,C) when B >= C -> B;
-max_acc(undefined,B,C) when B =< C -> C;
-max_acc(A,B,undefined) when A >= B -> A;
-max_acc(A,B,undefined) when A =< B -> B;
-max_acc(A,B,C) when A >= B, A >= C -> A;
-max_acc(A,B,C) when A >= B, B >= C -> A;
-max_acc(A,B,C) when A >= C, C >= B -> A;
-max_acc(A,B,C) when B >= C, B >= A -> B;
-max_acc(A,B,C) when B >= C, C >= A -> B;
-max_acc(A,B,C) when B >= A, A >= C -> B;
-max_acc(A,B,C) when C >= A, C >= B -> C;
-max_acc(A,B,C) when C >= A, A >= B -> C;
-max_acc(A,B,C) when C >= B, B >= A -> C.
+sum(Node) -> lists:sum(flatten(Node)).
+max(Node) -> lists:max(flatten(Node)).
 
 % NODE1 = btree:new(undefined, 1, undefined).
 % NODE2 = btree:new(undefined, 2, undefined).
