@@ -1,0 +1,1 @@
+-record(binary_tree, {left=nil, data, right=nil}).

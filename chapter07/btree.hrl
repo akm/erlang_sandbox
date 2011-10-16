@@ -1,1 +1,0 @@
--record(btree, {left=nil, data, right=nil}).
