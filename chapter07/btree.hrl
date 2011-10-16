@@ -1,1 +1,1 @@
--record(btree, {left, data, right}).
+-record(btree, {left=nil, data, right=nil}).
