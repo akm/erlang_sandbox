@@ -27,9 +27,10 @@ concat(Lists) ->
 % [X || X <- [1,2,3,4,5], Y <- [4,5,6,7,8], X == Y].
 
 
-zip_acc(_ , [], Acc) -> Acc;
-zip_acc([], _ , Acc) -> Acc;
-zip_acc([XH|XT], [YH|YT], Acc) -> zip_acc(XT, YT, [{XH,YH}| Acc]).
+zip_acc(_ , [], Acc, _) -> Acc;
+zip_acc([], _ , Acc, _) -> Acc;
+zip_acc([XH|XT], [YH|YT], Acc, F) -> 
+  zip_acc(XT, YT, [F(XH,YH)| Acc], F).
 
-zip(Xs, Ys) -> lists:reverse(zip_acc(Xs, Ys, [])).
+zip(Xs, Ys) -> lists:reverse(zip_acc(Xs, Ys, [], fun(X,Y) -> {X,Y} end)).
 
