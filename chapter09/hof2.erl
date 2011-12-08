@@ -1,6 +1,6 @@
 -module(hof2).
 -export([seq/1, filter_lte/1, pickup_even/1, sum/1, concat/1]).
--export([zip/2]).
+-export([zip/2, zipWith/3]).
 
 seq(N) ->
   fun() -> lists:seq(1,N) end.
@@ -32,5 +32,5 @@ zip_acc([], _ , Acc, _) -> Acc;
 zip_acc([XH|XT], [YH|YT], Acc, F) -> 
   zip_acc(XT, YT, [F(XH,YH)| Acc], F).
 
-zip(Xs, Ys) -> lists:reverse(zip_acc(Xs, Ys, [], fun(X,Y) -> {X,Y} end)).
-
+zipWith(Xs, Ys, F) -> lists:reverse(zip_acc(Xs, Ys, [], F)).
+zip(Xs, Ys) -> zipWith(Xs, Ys, fun(X,Y) -> {X,Y} end).
